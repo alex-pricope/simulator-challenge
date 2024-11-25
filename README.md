@@ -146,15 +146,18 @@ The logger is also injected in the SimulationService
 I added a very simple html page that helps with running the simulations. For this to work we need to do the following:
 
 #### Step 1
+---
 **Run the API locally** 
 ```ps
     # run the API on 5054. Navigate to the Gamebasics.Api folder
     dotnet run --urls "http://localhost:5054"
   ```
 #### Step 2
+----
 Navigate to: http://localhost:5054/index.html 
 
 #### Step 3
+---
 * The UI should have the values already present for the teams with `no optional parameters`
 * Team A is strongest, Team B is medium and Team C/D are weak 
 * Running a simulation should return a flattened result that contains the `group summary` and `rounds summary`
@@ -166,14 +169,14 @@ Navigate to: http://localhost:5054/index.html
 * Both of these have default values in the `SimulatorService` (25% and 30)
 
 **Results**:
-
+---
 ![image](https://github.com/user-attachments/assets/74fb8ea0-6a1b-411e-8689-17fa1ca71d9c)
 
 ## Limitations
-* The Simulation service is very far from a real simulation service, but I think this assignment is not about that
+* The Simulation service is far from a real simulation service, but I think this assignment is not about that
   * I tried to research and experiment a bit
   * My knowledge of probabilities is limited
-* Not all code is tested—I did this to save some time
+* Not all code is tested, I did this to save some time
   * I tried to show how I usually write unit tests/integration tests
 * I did not want to force the SimulationService to be async just to use the async-await pattern 
   * This could be done with `await Task.Run(() => RunMatchSimulation(teamA, teamB))` inside the service
