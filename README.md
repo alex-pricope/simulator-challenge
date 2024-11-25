@@ -1,10 +1,10 @@
 # Simulator challenge
 
 ## What was requested
-The challenge was to create a new website / application that will
+The challenge was to create a new website/application that will
 * Simulate the matches and results of a group of _4 teams_
 * A team has it's own _strength_. Re-running the simulation multiple times, we should observe stronger teams on top of the summary.
-  * This doesnt mean that the strong teams always win
+  * This doesn't mean that the strong teams always win
 * Players and other events are not required
 * The UI is not important
   * It would be good to show the _group statistics_ and _round statistics_
@@ -18,8 +18,10 @@ I picked a **webapi** solution for this, together with a basic form. The form ga
 to the API 
 
 The API also exposes a swagger endpoint where we can see the request models, result JSON, etc.
-This is also a good opportunity to show how I design, test and implement a solution.
-[image of API here]
+This is also a good opportunity to show how I design, test, and implement a solution.
+
+![image](https://github.com/user-attachments/assets/43f6dab3-fe19-4341-be2b-b6efac6acc69)
+
 
 The API also has the following:
 * Error middleware so we do not need to handle errors in the controller
@@ -64,7 +66,7 @@ Team A win probability (with draw): $0.666 \times (1-draw$) = $0.666 \times 0.8 
 
 Team B win probability (with draw): $0.333 \times (1-draw$) = $0.333 \times 0.8 = 0.267$
 
-To decide what team wins, the simulator will generate a random (double) number between: $[0d, 1d)$
+To decide what team wins, the simulator will generate a random (double) number between $[0d, 1d)$
 * If the random number falls inside Team A range $[0, 0.533)$ -> `Team A wins`
 * If the random number falls inside Team B range $[0.533, (0.533 + 0.267))$ -> `Team B wins`
 * If the random number falls outside Team A+B range $[(0.533 + 0.267), 1)$ -> `Draw`
@@ -76,7 +78,7 @@ Each team's strength influences the score.
 * A weaker team will score less against a stronger team
 * A strong team doesn't mean it always wins
 
-To achieve this, we take the strength into the score random calculation, after one of the team won (for example).
+To achieve this, we take the strength into the score random calculation, after one of the teams won (for example).
 
 > Team A (Strength 80) wins against Team B (Strength 40)
 
@@ -102,12 +104,12 @@ This is called the `Goal Factor` and it's configurable for the service. The **de
 The simulator will generate a random number between $WinScore= [1, \frac{WinnerStrength}{Factor})$ and use that as the score for the winning team.
 
 For the losing team, it will generate a random number between $[0, Min(\frac{LoserStrength}{Factor}, WinScore))$.
-This is to prevent the losing team scoring more than the winning team and still use the factor.
+This is to prevent the losing team from scoring more than the winning team and still use the factor.
 
-On top of that, I add some extra goals to the max possible goals to make the scores a bit more realistic. 
+On top of that, I added some extra goals to the max possible goals to make the scores a bit more realistic. 
 
 ## Libraries
-I use the following NUGET libraries
+I use the following NuGet libraries
 * NUnit to run tests / FluentAssertions to assert
 * MOQ
 * Serilog
@@ -123,23 +125,22 @@ To run the API locally:
     dotnet run --urls "http://localhost:5054"
   ```
 
-:WARN_ICON 
-I found that swagger UI caches (at least on my machine) the JSON result in the rendered UI, sometimes re-running the POST for simulations, 
+⚠️ I found that swagger UI caches (at least on my machine) the JSON result in the rendered UI, sometimes re-running the POST for simulations, 
 does NOT refresh the results view with the new JSON values. Better use the method above to see the summaries
 
 ## Unit tests
 * `Gamebasics.Services.Tests`
   * Unit tests for _SimulatorService_ and other components
 
-* For the `SimulatorService` I tried to cover the basics with running at least 1000 simulations sometimes and check the statistics.
+* For the `SimulatorService` I tried to cover the basics by running at least 1000 simulations sometimes and checking the statistics.
 
 ## Error handling
-The API has an error middleware where various errors are being caught and transformed to status codes. Also, I return a custom
+The API has an error middleware where various errors are being caught and transformed into status codes. Also, I return a custom
 `ErrorDetails` for these cases.
 
 ## Logging
-The API and any other service has the logger built injected.
-Each API call is logged, showing how long the request took, status code, etc.
+Each API call is logged, showing how long the request took, the status code, etc. 
+The logger is also injected in the SimulationService
 
 ## Simple UI element
 I added a very simple html page that helps with running the simulations. For this to work we need to do the following:
@@ -164,12 +165,16 @@ Navigate to: http://localhost:5054/index.html
 * `GoalFactor` - between 1 and 100 (integer). The higher the value, the lower to scores so we can simulate different types of games. 
 * Both of these have default values in the `SimulatorService` (25% and 30)
 
+**Results**:
+
+![image](https://github.com/user-attachments/assets/74fb8ea0-6a1b-411e-8689-17fa1ca71d9c)
+
 ## Limitations
 * The Simulation service is very far from a real simulation service, but I think this assignment is not about that
   * I tried to research and experiment a bit
   * My knowledge of probabilities is limited
 * Not all code is tested—I did this to save some time
-  * I tried to show how I usually write unit tests / integration tests
+  * I tried to show how I usually write unit tests/integration tests
 * I did not want to force the SimulationService to be async just to use the async-await pattern 
   * This could be done with `await Task.Run(() => RunMatchSimulation(teamA, teamB))` inside the service
   * This could be done later if needed
