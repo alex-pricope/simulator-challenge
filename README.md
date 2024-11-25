@@ -126,7 +126,7 @@ To run the API locally:
   ```
 
 ⚠️ I found that swagger UI caches (at least on my machine) the JSON result in the rendered UI, sometimes re-running the POST for simulations, 
-does NOT refresh the results view with the new JSON values. Better use the method above to see the summaries
+does NOT refresh the results view with the new JSON values. Better to use the UI to see the results.
 
 ## Unit tests
 * `Gamebasics.Services.Tests`
