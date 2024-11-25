@@ -26,7 +26,7 @@ This is also a good opportunity to show how I design, test, and implement a solu
 The API also has the following:
 * Error middleware so we do not need to handle errors in the controller
 * Logging enabled
-* Return a custom ErrorDetails for every error (Status and Message)
+* Return a custom `ErrorDetails` for every error (Status and Message)
 * DTO separation from models
 * Good documentation, versioned, swagger enabled
 
@@ -181,4 +181,5 @@ Navigate to: http://localhost:5054/index.html
 * I did not want to force the SimulationService to be async just to use the async-await pattern 
   * This could be done with `await Task.Run(() => RunMatchSimulation(teamA, teamB))` inside the service
   * This could be done later if needed
+* Does not support more than 4 teams (odd number / less than 4) - to do this it would had make the simulation service more complex
 
