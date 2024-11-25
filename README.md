@@ -44,7 +44,7 @@ The solution has the following components
   * No team should play twice in a round
   * Each team should play all other teams
   * For a group of 4 teams, should be 6 matches
-* Has a configurable `Draw Probability` (default 25%, double)
+* Has a configurable `Draw Probability` (default 0.25, double) translates to 25%
 * Has a configurable `Goal Factor` (default 30, integer)
 * Implements an interface for easy injection, mocking 
 
@@ -52,7 +52,7 @@ The solution has the following components
 The simulation is run between `Team A` and `Team B` - each team has its own `Strength`.
 The strength influences each team probability to score:
 
-> Given 2 teams, Team A (Strength 80), Team B (Strength 40), Draw: 20%
+> Given 2 teams, Team A (Strength 80), Team B (Strength 40), Draw: 0.20 (20%)
 
 Team A win probability (without draw): $A = \frac{Strength A}{Strength A + Strength B} = \frac{80}{80+40}=0.666$
 
