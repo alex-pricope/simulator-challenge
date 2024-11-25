@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soccer Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 5px 0;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .team-group {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .team-group h3 {
+            margin-top: 0;
+        }
+        .settings-group {
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Soccer Simulation</h1>
+<form id="simulation-form">
+    <!-- Team Details -->
+    <h2>Teams</h2>
+    <div id="teams-container">
+        <div class="team-group" id="team-1">
+            <h3>Team 1</h3>
+            <label for="team1-name">Name</label>
+            <input type="text" id="team1-name" name="team1-name" value="A" required>
+            <label for="team1-strength">Strength</label>
+            <input type="number" id="team1-strength" name="team1-strength" min="1" max="100" value="90" required>
+        </div>
+        <div class="team-group" id="team-2">
+            <h3>Team 2</h3>
+            <label for="team2-name">Name</label>
+            <input type="text" id="team2-name" name="team2-name" value="B" required>
+            <label for="team2-strength">Strength</label>
+            <input type="number" id="team2-strength" name="team2-strength" min="1" max="100" value="55" required>
+        </div>
+        <div class="team-group" id="team-3">
+            <h3>Team 3</h3>
+            <label for="team3-name">Name</label>
+            <input type="text" id="team3-name" name="team3-name" value="C" required>
+            <label for="team3-strength">Strength</label>
+            <input type="number" id="team3-strength" name="team3-strength" min="1" max="100" value="32" required>
+        </div>
+        <div class="team-group" id="team-4">
+            <h3>Team 4</h3>
+            <label for="team4-name">Name</label>
+            <input type="text" id="team4-name" name="team4-name" value="D" required>
+            <label for="team4-strength">Strength</label>
+            <input type="number" id="team4-strength" name="team4-strength" min="1" max="100" value="32" required>
+        </div>
+    </div>
+
+    <!-- Simulation Settings -->
+    <div class="settings-group">
+        <h2>Simulation optional parameters</h2>
+        <h3>Leave blank for default values (0.25 / 30)</h3>
+        <label for="draw-probability">Draw Probability (0.0 - 1.0) (eg: 0.33 = 33%) </label>
+        <input type="number" id="draw-probability" name="draw-probability" min="0" max="1" step="0.01" value="">
+
+        <label for="goal-factor">Goal Factor</label>
+        <input type="number" id="goal-factor" name="goal-factor" min="1" value="">
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit">Run Simulation</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    const form = document.getElementById('simulation-form');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        // Collect form data
+        const requestBody = {
+            teams: [
+                { name: form['team1-name'].value, strength: +form['team1-strength'].value },
+                { name: form['team2-name'].value, strength: +form['team2-strength'].value },
+                { name: form['team3-name'].value, strength: +form['team3-strength'].value },
+                { name: form['team4-name'].value, strength: +form['team4-strength'].value }
+            ]
+        };
+        
+        // These should be included only if they are supplied
+        const drawProbability = form['draw-probability'].value;
+        if (drawProbability !== "") {
+            requestBody.draw_probability = +drawProbability;
+        }
+
+        const goalFactor = form['goal-factor'].value;
+        if (goalFactor !== "") {
+            requestBody.goal_factor = +goalFactor;
+        }
+
+        try {
+            // Send POST request to API
+            const response = await fetch('/api/v1/simulate/groups', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Simulation failed: ${errorText}`);
+            }
+            const result = await response.json();
+
+            // Flatten the result
+            const flattenResult = (result) => {
+                let output = "Group Summary:\n";
+
+                // Process summary
+                for (const [teamName, teamStats] of Object.entries(result.summary)) {
+                    output += `Team: ${teamName} (${teamStats.strength}) - `;
+                    output += `(Played: ${teamStats.played}, Wins: ${teamStats.wins}, Draws: ${teamStats.draws}, Losses: ${teamStats.losses}, `;
+                    output += `For: ${teamStats.for}, Against: ${teamStats.against}, Diff: ${teamStats.diff}, Points: ${teamStats.points})\n`;
+                }
+
+                output += "\nRounds:\n";
+
+                // Process rounds
+                for (const [roundNumber, matches] of Object.entries(result.rounds)) {
+                    output += `Round ${roundNumber}:\n`;
+                    matches.forEach(match => {
+                        output += `  ${match.home_team} ${match.home_score}-${match.away_score} ${match.away_team}\n`;
+                    });
+                }
+
+                return output;
+            };
+
+            // Use the flattened result
+            resultDiv.innerHTML = `<pre>${flattenResult(result)}</pre>`;
+        } catch (error) {
+            resultDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+        }
+    });
+</script>
+</body>
+</html>
