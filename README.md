@@ -172,6 +172,8 @@ Navigate to: http://localhost:5054/index.html
 ---
 ![image](https://github.com/user-attachments/assets/74fb8ea0-6a1b-411e-8689-17fa1ca71d9c)
 
+The results contain the group summary (ordered by points) and individual round summary
+
 ## Limitations
 * The Simulation service is far from a real simulation service, but I think this assignment is not about that
   * I tried to research and experiment a bit
@@ -181,5 +183,5 @@ Navigate to: http://localhost:5054/index.html
 * I did not want to force the SimulationService to be async just to use the async-await pattern 
   * This could be done with `await Task.Run(() => RunMatchSimulation(teamA, teamB))` inside the service
   * This could be done later if needed
-* Does not support more than 4 teams (odd number / less than 4) - to do this it would had make the simulation service more complex
+* Does not support more than 4 teams (odd number / less than 4) - to do this it would have made the simulation service more complex
 
